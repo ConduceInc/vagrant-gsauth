@@ -4,7 +4,7 @@ module VagrantPlugins
   module GSAuth
     module Errors
       class VagrantGSAuthError < Vagrant::Errors::VagrantError
-        error_namespace('vagrant_s3auth.errors')
+        error_namespace('vagrant_gsauth.errors')
       end
 
       class UnknownBucketError < VagrantGSAuthError

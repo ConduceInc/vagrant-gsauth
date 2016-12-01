@@ -1,56 +1,12 @@
 en:
-  vagrant_s3auth:
-    downloader:
-      env_credential_provider: |-
-        Signing S3 request with key '%{access_key}' loaded from $%{env_var}
-
-      profile_credential_provider: |-
-        Signing S3 request with key '%{access_key}' loaded from profile '%{profile}'
-
+  vagrant_gsauth:
     errors:
-      missing_credentials: |-
-        Unable to find AWS credentials.
-
-        Ensure the following variables are set in your environment, or set
-        them at the top of your Vagrantfile:
-
-            AWS_ACCESS_KEY_ID
-            AWS_SECRET_ACCESS_KEY
-
-        Alternatively, you can create a credential profile and set the
-
-            AWS_PROFILE
-
-        environment variable. Consult the documentation for details.
-
       malformed_shorthand_url: |-
         Malformed shorthand GS box URL:
 
             %{url}
 
         Check your `box_url` setting.
-
-      s3_api_error: |-
-        Unable to communicate with Amazon S3 to download box. The S3 API reports:
-
-            %{error}
-
-      bucket_location_access_denied_error: |-
-        Request for box's Amazon S3 region was denied.
-
-        This usually indicates that your user account is misconfigured. Ensure
-        your IAM policy allows the "s3:GetBucketLocation" action for your bucket:
-
-            arn:aws:s3:::%{bucket}
-
-      box_download_forbidden: |-
-        This box is hosted on Amazon S3. A 403 Forbidden error usually indicates
-        that your user account is misconfigured. Ensure your IAM policy allows
-        the "s3:GetObject" action for your bucket:
-
-            arn:aws:s3:::%{bucket}/*
-
-        It may also indicate the box does not exist, so check your spelling.
 
       unknown_bucket: |-
         Unable to determine the bucket
