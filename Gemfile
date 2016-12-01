@@ -8,5 +8,6 @@ end
 
 group :plugins do
   gemspec
+  gem 'google-api-client', :require => 'google/apis/storage_v1'
   gem 'vagrant-aws', git: 'git://github.com/mitchellh/vagrant-aws.git', ref: 'master'
 end

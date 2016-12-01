@@ -10,7 +10,7 @@ require_relative 'support'
 
   if ARGV.include?('--all')
     buckets = s3.buckets.select do |b|
-      b.name.include?('vagrant-s3auth.com') && b.name.include?(region)
+      b.name.include?('vagrant-gsauth.com') && b.name.include?(region)
     end
   else
     buckets = [s3.bucket("#{region}.#{BUCKET}")]

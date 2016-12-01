@@ -8,19 +8,19 @@ require_relative 'errors'
 require_relative 'extension/downloader'
 
 module VagrantPlugins
-  module S3Auth
+  module GSAuth
     class Plugin < Vagrant.plugin('2')
       Vagrant.require_version('>= 1.5.1')
 
-      name 's3auth'
+      name 'gsauth'
 
       description <<-DESC
-        Use versioned Vagrant boxes with S3 authentication.
+        Use versioned Vagrant boxes with Google Cloud authentication.
       DESC
 
-      action_hook(:s3_urls, :authenticate_box_url) do |hook|
-        require_relative 'middleware/expand_s3_urls'
-        hook.prepend(ExpandS3Urls)
+      action_hook(:gs_urls, :authenticate_box_url) do |hook|
+        require_relative 'middleware/expand_gs_urls'
+        hook.prepend(ExpandGSUrls)
       end
     end
   end

@@ -8,8 +8,8 @@ You'll need Ruby and Bundler, of course. Then, check out the code and install
 the gems:
 
 ```bash
-$ git clone git@github.com:WhoopInc/vagrant-s3auth.git
-$ cd vagrant-s3auth
+$ git clone git@github.com:conduceinc/vagrant-gsauth.git
+$ cd vagrant-gsauth
 $ bundle
 ```
 

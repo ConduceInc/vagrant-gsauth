@@ -1,11 +1,11 @@
-# vagrant-s3auth
+# vagrant-gsauth
 
 <a href="https://travis-ci.org/WhoopInc/vagrant-s3auth">
   <img src="https://travis-ci.org/WhoopInc/vagrant-s3auth.svg?branch=master"
     align="right">
 </a>
 
-Private, versioned Vagrant boxes hosted on Amazon S3.
+Private, versioned Vagrant boxes hosted in Google Cloud Storage.
 
 ## Installation
 
@@ -21,16 +21,16 @@ $ vagrant plugin install vagrant-s3auth
 
 ## Usage
 
-vagrant-s3auth will automatically sign requests for S3 URLs
+vagrant-gsauth will automatically sign requests for GS URLs
 
 ```
-s3://bucket.example.com/path/to/metadata
+gs://bucket/path/to/metadata
 ```
 
-with your AWS access key.
+with your Google Cloud Application Credentials.
 
-This means you can host your team's sensitive, private boxes on S3, and use your
-developers' existing AWS credentials to securely grant access.
+This means you can host your team's sensitive, private boxes in Google Storage, and use your
+developers' existing Google credentials to securely grant access.
 
 If you've already got your credentials stored in the standard environment
 variables:
@@ -40,7 +40,7 @@ variables:
 
 Vagrant.configure('2') do |config|
   config.vm.box     = 'simple-secrets'
-  config.vm.box_url = 's3://example.com/secret.box'
+  config.vm.box_url = 'gs://example.com/secret.box'
 end
 ```
 
@@ -68,7 +68,7 @@ aws_secret_access_key = ...
 # Vagrantfile
 
 ENV.delete_if { |name| name.start_with?('AWS_') }  # Filter out rogue env vars.
-ENV['AWS_PROFILE'] = 'vagrant-s3auth'
+ENV['AWS_PROFILE'] = 'vagrant-gsauth'
 
 Vagrant.configure("2") { |config| ... }
 ```
@@ -240,20 +240,15 @@ install a plugin is lame.
 But wait! Just stick some shell in your Vagrantfile:
 
 ```ruby
-unless Vagrant.has_plugin?('vagrant-s3auth') || ARGV.include?("plugin")
+unless Vagrant.has_plugin?('vagrant-gsauth')
   # Attempt to install ourself. Bail out on failure so we don't get stuck in an
   # infinite loop.
-  system('vagrant plugin install vagrant-s3auth') || exit!
+  system('vagrant-gsauth') || exit!
 
   # Relaunch Vagrant so the plugin is detected. Exit with the same status code.
   exit system('vagrant', *ARGV)
 end
 ```
-
-**Warning:** the above code is brittle. Prior versions of the above code were
-incompatible with Vagrant 1.9 and caused a hard-to-debug failure. Follow
-mitchellh/vagrant#8055 to watch the development of an officially-supported
-mechanism to request plugin installation.
 
 [aws-403-404]: https://forums.aws.amazon.com/thread.jspa?threadID=56531#jive-message-210346
 [aws-cred-file]: http://blogs.aws.amazon.com/security/post/Tx3D6U6WSFGOK2H/A-New-and-Standardized-Way-to-Manage-Credentials-in-the-AWS-SDKs

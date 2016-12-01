@@ -1,8 +1,8 @@
 require 'uri'
 
 module VagrantPlugins
-  module S3Auth
-    class ExpandS3Urls
+  module GSAuth
+    class ExpandGSUrls
       def initialize(app, _)
         @app = app
       end
@@ -11,11 +11,11 @@ module VagrantPlugins
         env[:box_urls].map! do |url_string|
           url = URI(url_string)
 
-          if url.scheme == 's3'
+          if url.scheme == 'gs'
             bucket = url.host
             key = url.path[1..-1]
             raise Errors::MalformedShorthandURLError, url: url unless bucket && key
-            next "http://s3-placeholder.amazonaws.com/#{bucket}/#{key}"
+            next "https://storage.cloud.google.com/#{bucket}/#{key}"
           end
 
           url_string

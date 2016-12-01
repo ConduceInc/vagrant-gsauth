@@ -1,9 +1,9 @@
 require 'pathname'
 
-require 'vagrant-s3auth/plugin'
+require 'vagrant-gsauth/plugin'
 
 module VagrantPlugins
-  module S3Auth
+  module GSAuth
     def self.source_root
       @source_root ||= Pathname.new(File.expand_path('../../', __FILE__))
     end

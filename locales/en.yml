@@ -51,3 +51,6 @@ en:
             arn:aws:s3:::%{bucket}/*
 
         It may also indicate the box does not exist, so check your spelling.
+
+      unknown_bucket: |-
+        Unable to determine the bucket

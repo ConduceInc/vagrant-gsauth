@@ -32,7 +32,7 @@ after_script:
 env:
   global:
   - VAGRANT_S3AUTH_ATLAS_BOX_NAME="travis-$TRAVIS_JOB_NUMBER"
-  - VAGRANT_S3AUTH_BUCKET="travis-$TRAVIS_JOB_NUMBER.vagrant-s3auth.com"
+  - VAGRANT_S3AUTH_BUCKET="travis-$TRAVIS_JOB_NUMBER.vagrant-gsauth.com"
   - VAGRANT_S3AUTH_REGION_NONSTANDARD=eu-west-1
   - VAGRANT_S3AUTH_BOX_BASE=minimal
   matrix:
@@ -45,7 +45,7 @@ env:
 deploy:
   provider: rubygems
   api_key:
-    secure: b7ZiPX6EfA4DNV6B65ZvVJF8Xswne4N0MdIqwTkyQ5//0+3hSHg0ChTvjeb+eeTcPFiYxuh0UvXqJMtxi8hCJub03aJ5qeDDm6FJeM7WqsHmXx6A6UGFxnCTi6z7IaaBCs71jygzdjN6AaKOV9PuvhD079dci/yylr0SDHQgvrY=
+    secure: foobar
   on:
     tags: true
-    repo: WhoopInc/vagrant-s3auth
+    repo: ConduceInc/vagrant-gsauth
