@@ -12,7 +12,7 @@ Private, versioned Vagrant boxes hosted in Google Cloud Storage.
 From the command line:
 
 ```bash
-$ vagrant plugin install vagrant-s3auth
+$ vagrant plugin install vagrant-gsauth
 ```
 
 ### Requirements
@@ -107,10 +107,7 @@ end
 ```
 
 **IMPORTANT:** Your metadata *must* be served with `Content-Type: application/json`
-or Vagrant will not recognize it as metadata! Most S3 uploader tools (and most
-webservers) will *not* automatically set the `Content-Type` header when the file
-extension is not `.json`. Consult your tool's documentation for instructions on
-manually setting the content type.
+or Vagrant will not recognize it as metadata!
 
 ## Auto-install
 
