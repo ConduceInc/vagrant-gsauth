@@ -7,12 +7,18 @@ require 'google/apis/storage_v1'
 
 module VagrantPlugins
   module GSAuth
-    module GSUtil
-      MEDIA_URL_MATCHER = /^\/download\/storage\/v1\/b\/(?<bucket>[[:alnum:]_\-]+)\/o\/(?<key>[[:alnum:]\-_]+)/
+    module Util
+      MEDIA_URL_MATCHER = %r{
+        ^\/download\/storage\/v1\/b\/   # Literal string '/download/storage/v1/b/'
+        (?<bucket>[[:alnum:]_\-]+)      # Sequence of alphnumeric characters plus _ and -
+        \/o\/                           # Literal string '/o/'
+        (?<key>[[:alnum:]\-_]+)         # Next sequence of alphnumeric characters plus _ and -
+      }x
 
       def self.storage_svc
         svc = Google::Apis::StorageV1::StorageService.new
-        svc.authorization = Google::Auth.get_application_default(["https://www.googleapis.com/auth/devstorage.read_only"])
+        scopes = ['https://www.googleapis.com/auth/devstorage.read_only']
+        svc.authorization = Google::Auth.get_application_default(scopes)
         svc
       end
 
@@ -31,14 +37,12 @@ module VagrantPlugins
           key = components.join('/')
         end
 
-        if bucket && key
-          self.storage_svc.get_object(bucket, key)
-        end
+        storage_svc.get_object(bucket, key) if bucket && key
       end
 
       def self.authorization_header
         auth_headers = {}
-        self.storage_svc.authorization.apply(auth_headers)
+        storage_svc.authorization.apply(auth_headers)
       end
     end
   end

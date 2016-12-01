@@ -1,7 +1,7 @@
 # vagrant-gsauth
 
-<a href="https://travis-ci.org/WhoopInc/vagrant-s3auth">
-  <img src="https://travis-ci.org/WhoopInc/vagrant-s3auth.svg?branch=master"
+<a href="https://travis-ci.org/ConduceInc/vagrant-gsauth">
+  <img src="https://travis-ci.org/ConduceInc/vagrant-gsauth.svg?branch=master"
     align="right">
 </a>
 
@@ -123,7 +123,7 @@ But wait! Just stick some shell in your Vagrantfile:
 unless Vagrant.has_plugin?('vagrant-gsauth')
   # Attempt to install ourself. Bail out on failure so we don't get stuck in an
   # infinite loop.
-  system('vagrant-gsauth') || exit!
+  system('vagrant plugin install vagrant-gsauth') || exit!
 
   # Relaunch Vagrant so the plugin is detected. Exit with the same status code.
   exit system('vagrant', *ARGV)

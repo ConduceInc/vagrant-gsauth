@@ -14,7 +14,7 @@ module Vagrant
         # on this implementation detail because we need to hook into both
         # HEAD and GET requests.
         url = options.last
-        gs_object = GSAuth::GSUtil.get_object(url)
+        gs_object = GSAuth::Util.get_object(url)
         return unless gs_object
 
         @logger.info("gsauth: Discovered GS URL: #{@source}")
@@ -24,9 +24,9 @@ module Vagrant
         url.replace(gs_object.media_link)
         @logger.debug("gsauth: Media download link: #{gs_object.media_link}")
 
-        auth_headers = GSAuth::GSUtil.authorization_header
+        auth_headers = GSAuth::Util.authorization_header
 
-        options.insert(0, *auth_headers.map { |k,v| ['-H', "#{k}: #{v}"] }.flatten)
+        options.insert(0, *auth_headers.map { |k, v| ['-H', "#{k}: #{v}"] }.flatten)
 
         execute_curl_without_gsauth(options, subprocess_options, &data_proc)
       rescue Errors::DownloaderError => e
