@@ -1,5 +1,5 @@
 {
-  "name": "vagrant-s3auth/minimal",
+  "name": "%{bucket}/minimal",
   "description": "This box contains company secrets.",
   "versions": [{
     "version": "1.0.1",

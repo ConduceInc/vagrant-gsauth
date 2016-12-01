@@ -1,35 +1,29 @@
 #!/usr/bin/env ruby
 
 require 'bundler/setup'
-require 'aws-sdk'
+require 'googleauth'
+require 'google/apis/storage_v1'
 
 require_relative 'support'
 
 ROOT = Pathname.new(File.dirname(__FILE__))
 
-box_urls = [REGION_STANDARD, REGION_NONSTANDARD].flat_map do |region|
-  s3 = Aws::S3::Resource.new(region: region)
-  bucket = s3.create_bucket(bucket: "#{region}.#{BUCKET}")
+svc = Google::Apis::StorageV1::StorageService.new
+svc.authorization = Google::Auth.get_application_default(SCOPES)
+svc.insert_bucket(PROJECT, Google::Apis::StorageV1::Bucket.new(name: BUCKET))
 
-  [BOX_BASE, 'public-' + BOX_BASE].flat_map do |box_name|
-    box = bucket.object("#{box_name}.box")
-    box.upload_file(ROOT + Pathname.new("box/#{box_name}.box"))
-    box.acl.put(acl: 'public-read') if box_name.start_with?('public')
+box_file = File.open(ROOT + Pathname.new("box/#{BOX_BASE}.box"))
+box_obj = svc.insert_object(BUCKET, name: "#{BOX_BASE}.box",
+                                    upload_source: box_file,
+                                    content_type: 'application/x-gzip')
 
-    metadata_string = File.read(ROOT + Pathname.new("box/#{box_name}")) % {
-      box_url: box.public_url
-    }
+metadata_string = File.read(ROOT + Pathname.new("box/#{BOX_BASE}")) % {
+  bucket: BUCKET,
+  box_url: "https://storage.googleapis.com/#{BUCKET}/#{BOX_BASE}.box"
+}
 
-    metadata = bucket.object(box_name)
-    metadata.put(body: metadata_string, content_type: 'application/json')
-    metadata.acl.put(acl: 'public-read') if box_name.start_with?('public')
+svc.insert_object(BUCKET, name: BOX_BASE,
+                          upload_source: StringIO.new(metadata_string),
+                          content_type: 'application/json')
 
-    box.public_url
-  end
-end
-
-atlas = Atlas.new(ATLAS_TOKEN, ATLAS_USERNAME)
-atlas.create_box(ATLAS_BOX_NAME)
-atlas.create_version(ATLAS_BOX_NAME, '1.0.1')
-atlas.create_provider(ATLAS_BOX_NAME, '1.0.1', box_urls.sample)
-atlas.release_version(ATLAS_BOX_NAME, '1.0.1')
+box_obj.self_link

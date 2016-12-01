@@ -1,23 +1,15 @@
 #!/usr/bin/env ruby
 
 require 'bundler/setup'
-require 'aws-sdk'
+require 'googleauth'
+require 'google/apis/storage_v1'
 
 require_relative 'support'
 
-[REGION_STANDARD, REGION_NONSTANDARD].each do |region|
-  s3 = Aws::S3::Resource.new(region: region)
+svc = Google::Apis::StorageV1::StorageService.new
+svc.authorization = Google::Auth.get_application_default(SCOPES)
 
-  if ARGV.include?('--all')
-    buckets = s3.buckets.select do |b|
-      b.name.include?('vagrant-gsauth.com') && b.name.include?(region)
-    end
-  else
-    buckets = [s3.bucket("#{region}.#{BUCKET}")]
-  end
-
-  buckets.each { |b| b.delete! if b.exists? }
-end
-
-atlas = Atlas.new(ATLAS_TOKEN, ATLAS_USERNAME)
-atlas.delete_box(ATLAS_BOX_NAME)
+svc.delete_object(BUCKET, BOX_BASE)
+svc.delete_object(BUCKET, "#{BOX_BASE}.box")
+sleep 1
+svc.delete_bucket(BUCKET)

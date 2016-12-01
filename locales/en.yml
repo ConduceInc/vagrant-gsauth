@@ -24,7 +24,7 @@ en:
         environment variable. Consult the documentation for details.
 
       malformed_shorthand_url: |-
-        Malformed shorthand S3 box URL:
+        Malformed shorthand GS box URL:
 
             %{url}
 

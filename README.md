@@ -21,13 +21,13 @@ $ vagrant plugin install vagrant-s3auth
 
 ## Usage
 
-vagrant-gsauth will automatically sign requests for GS URLs
+vagrant-gsauth will parse GS URLs:
 
 ```
 gs://bucket/path/to/metadata
 ```
 
-with your Google Cloud Application Credentials.
+And authorize the request using your Google Cloud SDK login.
 
 This means you can host your team's sensitive, private boxes in Google Storage, and use your
 developers' existing Google credentials to securely grant access.
