@@ -46,143 +46,28 @@ end
 
 ### Configuration
 
-#### AWS credentials
+#### Google Cloud credentials
 
-AWS credentials are read from the standard environment variables
-`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+https://cloud.google.com/sdk/
 
-You may find it more convenient to use the
-[centralized credential file][aws-cred-file] to create a credential
-profile. Select the appropriate profile using the `AWS_PROFILE`
-environment variable. For example:
+#### GS URLs
 
-```ini
-# ~/.aws/credentials
-
-[vagrant-s3auth]
-aws_access_key_id = AKIA...
-aws_secret_access_key = ...
-```
-
-```ruby
-# Vagrantfile
-
-ENV.delete_if { |name| name.start_with?('AWS_') }  # Filter out rogue env vars.
-ENV['AWS_PROFILE'] = 'vagrant-gsauth'
-
-Vagrant.configure("2") { |config| ... }
-```
-
-**CAUTION:** If `AWS_ACCESS_KEY_ID` exists in your environment, it will
-take precedence over `AWS_PROFILE`! Either take care to filter rogue
-environment variables as above, or set the access key explicitly:
-
-```ruby
-access_key, secret_key = whizbang_inc_api.fetch_api_creds()
-ENV['AWS_ACCESS_KEY_ID']     = access_key
-ENV['AWS_SECRET_ACCESS_KEY'] = secret_key
-```
-
-The detected AWS access key and its source (environment variable or
-profile file) will be displayed when the box is downloaded. If you use
-multiple AWS credentials and see authentication errors, verify that the
-correct access key was detected.
-
-##### IAM configuration
-
-IAM accounts will need at least the following policy:
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::BUCKET/*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
-      "Resource": "arn:aws:s3:::BUCKET"
-    }
-  ]
-}
-```
-
-**IMPORTANT:** You must split up bucket and object permissions into separate policy statements as written above! See [Writing IAM Policies: How to grant access to an Amazon S3 Bucket][aws-s3-iam].
-
-Also note that `s3:ListBucket` permission is not strictly necessary. vagrant-s3auth will never
-make a ListBucket request, but without ListBucket permission, a misspelled box
-name results in a 403 Forbidden error instead of a 404 Not Found error. ([Why?][aws-403-404])
-
-See [AWS S3 Guide: User Policy Examples][aws-user-policy] for more.
-
-#### S3 URLs
-
-You can use any valid HTTP(S) URL for your object:
-
-```bash
-# path style
-http://s3.amazonaws.com/bucket/resource
-https://s3.amazonaws.com/bucket/resource
-
-# host style
-http://bucket.s3.amazonaws.com/resource
-https://bucket.s3.amazonaws.com/resource
-```
-
-Or the S3 protocol shorthand
+You can use the gs protocol shorthand
 
 ```
-s3://bucket/resource
+gs://bucket/resource
 ```
 
-which expands to the path-style HTTPS URL.
-
-##### Non-standard regions
-
-If your bucket is not hosted in the US Standard region, you'll need to specify
-the correct region endpoint as part of the URL:
-
-```
-https://s3-us-west-2.amazonaws.com/bucket/resource
-https://bucket.s3-us-west-2.amazonaws.com/resource
-```
-
-Or just use the S3 protocol shorthand, which will automatically determine the
-correct region at the cost of an extra API call:
-
-```
-s3://bucket/resource
-```
-
-For additional details on specifying S3 URLs, refer to the [S3 Developer Guide:
-Virtual hosting of buckets][bucket-vhost].
+which expands to full path HTTPS URL.
 
 #### Simple boxes
 
-Simply point your `box_url` at a [supported S3 URL](#s3-url):
+Simply point your `box_url` at a google storage URL:
 
 ```ruby
 Vagrant.configure('2') do |config|
   config.vm.box     = 'simple-secrets'
-  config.vm.box_url = 'https://s3.amazonaws.com/bucket.example.com/secret.box'
-end
-```
-
-#### Vagrant Cloud
-
-If you've got a box version on [Vagrant Cloud][vagrant-cloud], just point it at
-a [supported S3 URL](#s3-urls):
-
-![Adding a S3 box to Vagrant Cloud](https://cloud.githubusercontent.com/assets/882976/3273399/d5d70966-f323-11e3-8393-22195050aeac.png)
-
-Then configure your Vagrantfile like normal:
-
-```ruby
-Vagrant.configure('2') do |config|
-  config.vm.box = 'benesch/test-box'
+  config.vm.box_url = 'gs://bucket/secret.box'
 end
 ```
 
@@ -199,12 +84,12 @@ that tells Vagrant where to find all possible versions:
 
 Vagrant.configure('2') do |config|
   config.vm.box     = 'examplecorp/secrets'
-  config.vm.box_url = 's3://example.com/secrets'
+  config.vm.box_url = 'gs://bucket/secrets'
 end
 ```
 
 ```json
-"s3://example.com/secrets"
+"gs://bucket/secrets"
 
 {
   "name": "examplecorp/secrets",
@@ -213,18 +98,13 @@ end
     "version": "0.1.0",
     "providers": [{
       "name": "virtualbox",
-      "url": "https://s3.amazonaws.com/example.com/secrets.box",
+      "url": "gs://bucket/secrets/1.0.0/secrets.box",
       "checksum_type": "sha1",
       "checksum": "foo"
     }]
   }]
 }
 ```
-
-Within your metadata JSON, be sure to use [supported S3 URLs](#s3-urls).
-
-Note that the metadata itself doesn't need to be hosted on S3. Any metadata that
-points to a supported S3 URL will result in an authenticated request.
 
 **IMPORTANT:** Your metadata *must* be served with `Content-Type: application/json`
 or Vagrant will not recognize it as metadata! Most S3 uploader tools (and most
@@ -250,12 +130,5 @@ unless Vagrant.has_plugin?('vagrant-gsauth')
 end
 ```
 
-[aws-403-404]: https://forums.aws.amazon.com/thread.jspa?threadID=56531#jive-message-210346
-[aws-cred-file]: http://blogs.aws.amazon.com/security/post/Tx3D6U6WSFGOK2H/A-New-and-Standardized-Way-to-Manage-Credentials-in-the-AWS-SDKs
-[aws-s3-iam]: http://blogs.aws.amazon.com/security/post/Tx3VRSWZ6B3SHAV/Writing-IAM-Policies-How-to-grant-access-to-an-Amazon-S3-bucket
-[aws-signed]: http://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAuthentication.html#ConstructingTheAuthenticationHeader
-[aws-user-policy]: http://docs.aws.amazon.com/AmazonS3/latest/dev/example-policies-s3.html
-[bucket-vhost]: http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html#VirtualHostingExamples
 [metadata-boxes]: http://docs.vagrantup.com/v2/boxes/format.html
 [vagrant]: http://vagrantup.com
-[vagrant-cloud]: http://vagrantcloud.com
