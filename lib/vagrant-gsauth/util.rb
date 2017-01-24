@@ -27,7 +27,7 @@ module VagrantPlugins
 
         if url.scheme == 'gs'
           bucket = url.host
-          key = url.path.split('/').last
+          key = url.path
         elsif match = MEDIA_URL_MATCHER.match(url.path)
           bucket = match['bucket']
           key = match['key']

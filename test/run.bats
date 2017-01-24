@@ -33,3 +33,7 @@ teardown() {
   [[ "$status" -eq 1 ]]
   [[ "$output" == *"Malformed shorthand GS box URL"* ]]
 }
+
+@test "standard boxes still work" {
+  bundle exec vagrant box add unbuntu/trusty64
+}

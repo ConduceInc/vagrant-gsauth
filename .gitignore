@@ -4,3 +4,6 @@ pkg
 *.gem
 .env
 Gemfile.lock
+
+*.iml
+.idea/

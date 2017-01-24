@@ -27,8 +27,9 @@ module Vagrant
         auth_headers = GSAuth::Util.authorization_header
 
         options.insert(0, *auth_headers.map { |k, v| ['-H', "#{k}: #{v}"] }.flatten)
+        @logger.debug("gsauth: curl options: #{options}")
 
-        execute_curl_without_gsauth(options, subprocess_options, &data_proc)
+        _execute_curl(options, subprocess_options, &data_proc)
       rescue Errors::DownloaderError => e
         if e.message =~ /403 Forbidden/
           e.message << "\n\n"
@@ -38,22 +39,24 @@ module Vagrant
         raise
       rescue Google::Apis::Error => e
         raise Errors::DownloaderError, message: e
-      rescue ::Seahorse::Client::NetworkingError => e
-        # Vagrant ignores download errors during e.g. box update checks
-        # because an internet connection isn't necessary if the box is
-        # already downloaded. Vagrant isn't expecting AWS's
-        # Seahorse::Client::NetworkingError, so we cast it to the
-        # DownloaderError Vagrant expects.
-        raise Errors::DownloaderError, message: e
       end
 
       def execute_curl_with_gsauth(options, subprocess_options, &data_proc)
+        url = options.last
+        if url.include?('storage.cloud.google')
+          # If the URL was expanded attempt a gsauth download first.
+          # Needed for grabbing metadata
+          gsauth_download(options, subprocess_options, &data_proc)
+        end
+
+        _execute_curl(options, subprocess_options, &data_proc)
+      rescue Errors::DownloaderError => e
         @ui.clear_line if @ui
 
         gsauth_download(options, subprocess_options, &data_proc) || (raise e)
       end
 
-      alias execute_curl_without_gsauth execute_curl
+      alias _execute_curl execute_curl
       alias execute_curl execute_curl_with_gsauth
     end
   end
